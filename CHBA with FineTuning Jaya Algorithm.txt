@@ -1,0 +1,54 @@
+# ---------------------------------
+# 4. Standard HBA with Tent Chaotic Maps and Jaya-based Fine-Tuning
+# ---------------------------------
+
+def standard_hba(cost_function, num_agents=20, iterations=100, dim=10):
+    """Standard Honey Badger Algorithm"""
+    agents = np.random.uniform(low=0, high=1, size=(num_agents, dim))
+    best_agent = agents[0]
+    best_score = cost_function(best_agent)
+
+    for t in range(iterations):
+        for i in range(num_agents):
+            agents[i] += np.random.uniform(0, 1) * (best_agent - agents[i])
+            agents[i] = np.clip(agents[i], 0, 1)
+            score = cost_function(agents[i])
+            if score < best_score:
+                best_agent = agents[i]
+                best_score = score
+
+    return best_agent, best_score
+
+def fine_tune_with_jaya(initial_solution, cost_function, iterations=50):
+    """Fine-tune parameters using Jaya algorithm"""
+    best_solution = initial_solution
+    best_score = cost_function(best_solution)
+    dim = len(initial_solution)
+
+    for t in range(iterations):
+        for _ in range(10):  # Number of candidates per iteration
+            candidate = best_solution + np.random.uniform(-0.1, 0.1, size=dim)
+            candidate = np.clip(candidate, 0, 1)
+            score = cost_function(candidate)
+            if score < best_score:
+                best_solution = candidate
+                best_score = score
+
+    return best_solution, best_score
+
+# Integrating Standard HBA, Tent Map, and Jaya for fine-tuning
+def enhanced_hba_with_jaya(cost_function, num_agents=20, iterations=100, dim=10):
+    """Enhanced HBA with Tent chaotic maps and Jaya-based fine-tuning"""
+    # Standard HBA with Tent map for initialization
+    best_agent, best_score = chba_optimize(cost_function, num_agents, iterations, dim)
+
+    # Fine-tune best solution with Jaya algorithm
+    best_agent, best_score = fine_tune_with_jaya(best_agent, cost_function)
+
+    return best_agent, best_score
+
+# Example usage of Enhanced HBA with Jaya
+best_solution, best_value = enhanced_hba_with_jaya(sample_cost_function)
+print("\nEnhanced HBA with Jaya")
+print("Best Solution:", best_solution)
+print("Best Value:", best_value)

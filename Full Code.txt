@@ -1,0 +1,187 @@
+
+# This code includes:
+# 1. AlexNet with Quaternion Enhancements and Atrous Convolution
+# 2. Chaotic Honey Badger Algorithm (CHBA)
+# 3. Fog-Edge-Cloud Framework simulation componentS
+
+import tensorflow as tf
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Conv2D, Dense, Flatten, MaxPooling2D, Input, BatchNormalization
+import numpy as np
+import random
+
+# ---------------------------------
+# 1. AlexNet with Quaternion Enhancements and Atrous Convolution
+# ---------------------------------
+
+def build_alexnet_quaternion(input_shape=(224, 224, 3)):
+    inputs = Input(shape=input_shape)
+
+    # First convolutional layer (Quaternion-inspired feature extraction)
+    x = Conv2D(96, (11, 11), strides=(4, 4), activation='relu')(inputs)
+    x = BatchNormalization()(x)
+    x = MaxPooling2D(pool_size=(3, 3), strides=(2, 2))(x)
+
+    # Atrous convolution (Spatial feature enhancement)
+    x = Conv2D(256, (5, 5), activation='relu', dilation_rate=2)(x)
+    x = BatchNormalization()(x)
+    x = MaxPooling2D(pool_size=(3, 3), strides=(2, 2))(x)
+
+    # Third convolutional layer
+    x = Conv2D(384, (3, 3), activation='relu')(x)
+    x = BatchNormalization()(x)
+
+    # Fully connected layers
+    x = Flatten()(x)
+    x = Dense(4096, activation='relu')(x)
+    x = Dense(4096, activation='relu')(x)
+    outputs = Dense(10, activation='softmax')(x)  # Example: 10 output classes
+
+    model = Model(inputs, outputs)
+    return model
+
+alexnet_model = build_alexnet_quaternion()
+alexnet_model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+alexnet_model.summary()
+
+# ---------------------------------
+# 2. Chaotic Honey Badger Algorithm (CHBA)
+# ---------------------------------
+
+def tent_map(iterations, size):
+    """Generate chaotic sequences using Tent map"""
+    x = random.random()
+    chaos = []
+    for _ in range(iterations):
+        x = 2 * x if x < 0.5 else 2 * (1 - x)
+        chaos.append(x)
+    return np.array(chaos[:size])
+
+def chba_optimize(cost_function, num_agents=20, iterations=100, dim=10):
+    """Chaotic Honey Badger Algorithm (CHBA)"""
+    # Initialize positions and chaotic sequence
+    agents = np.random.uniform(low=0, high=1, size=(num_agents, dim))
+    chaos_sequence = tent_map(iterations, size=num_agents)
+    
+    # Initialize best agent
+    best_agent = agents[0]
+    best_score = cost_function(best_agent)
+
+    for t in range(iterations):
+        for i in range(num_agents):
+            # Update position using chaotic sequences
+            agents[i] += chaos_sequence[i] * (best_agent - agents[i])
+            agents[i] = np.clip(agents[i], 0, 1)  # Keep within bounds
+
+            # Evaluate cost
+            score = cost_function(agents[i])
+            if score < best_score:
+                best_agent = agents[i]
+                best_score = score
+
+    return best_agent, best_score
+
+def sample_cost_function(x):
+    """Sample objective: Sphere function"""
+    return sum(x**2)
+
+best_solution, best_value = chba_optimize(sample_cost_function)
+print("Best Solution:", best_solution)
+print("Best Value:", best_value)
+
+
+# ---------------------------------
+# 3. Standard HBA with Tent Chaotic Maps and Jaya-based Fine-Tuning
+# ---------------------------------
+
+def standard_hba(cost_function, num_agents=20, iterations=100, dim=10):
+    """Standard Honey Badger Algorithm"""
+    agents = np.random.uniform(low=0, high=1, size=(num_agents, dim))
+    best_agent = agents[0]
+    best_score = cost_function(best_agent)
+
+    for t in range(iterations):
+        for i in range(num_agents):
+            agents[i] += np.random.uniform(0, 1) * (best_agent - agents[i])
+            agents[i] = np.clip(agents[i], 0, 1)
+            score = cost_function(agents[i])
+            if score < best_score:
+                best_agent = agents[i]
+                best_score = score
+
+    return best_agent, best_score
+
+def fine_tune_with_jaya(initial_solution, cost_function, iterations=50):
+    """Fine-tune parameters using Jaya algorithm"""
+    best_solution = initial_solution
+    best_score = cost_function(best_solution)
+    dim = len(initial_solution)
+
+    for t in range(iterations):
+        for _ in range(10):  # Number of candidates per iteration
+            candidate = best_solution + np.random.uniform(-0.1, 0.1, size=dim)
+            candidate = np.clip(candidate, 0, 1)
+            score = cost_function(candidate)
+            if score < best_score:
+                best_solution = candidate
+                best_score = score
+
+    return best_solution, best_score
+
+# Integrating Standard HBA, Tent Map, and Jaya for fine-tuning
+def enhanced_hba_with_jaya(cost_function, num_agents=20, iterations=100, dim=10):
+    """Enhanced HBA with Tent chaotic maps and Jaya-based fine-tuning"""
+    # Standard HBA with Tent map for initialization
+    best_agent, best_score = chba_optimize(cost_function, num_agents, iterations, dim)
+
+    # Fine-tune best solution with Jaya algorithm
+    best_agent, best_score = fine_tune_with_jaya(best_agent, cost_function)
+
+    return best_agent, best_score
+
+# Example usage of Enhanced HBA with Jaya
+best_solution, best_value = enhanced_hba_with_jaya(sample_cost_function)
+print("\nEnhanced HBA with Jaya")
+print("Best Solution:", best_solution)
+print("Best Value:", best_value)
+
+
+
+
+# ---------------------------------
+# 4. Fog-Edge-Cloud Framework Simulation
+# ---------------------------------
+
+def fog_edge_cloud_simulation():
+    """Simulation of IoAT device interactions with Fog and Cloud nodes"""
+    # Define fog nodes, cloud server, and tasks
+    fog_nodes = [{'id': i, 'capacity': random.randint(50, 100), 'latency': random.uniform(1, 5)} for i in range(5)]
+    cloud_server = {'id': 100, 'capacity': 1000, 'latency': 10.0}
+    tasks = [{'id': i, 'size': random.randint(10, 50), 'criticality': random.choice(['low', 'medium', 'high'])} for i in range(20)]
+
+    # Task assignment function
+    def assign_task(task):
+        assigned = False
+        # Try assigning to fog nodes based on capacity and latency
+        for node in sorted(fog_nodes, key=lambda x: x['latency']):
+            if task['size'] <= node['capacity']:
+                print(f"Task {task['id']} (Criticality: {task['criticality']}) assigned to Fog Node {node['id']} (Latency: {node['latency']:.2f} ms)")
+                node['capacity'] -= task['size']
+                assigned = True
+                break
+        # Assign to cloud if no fog node is available
+        if not assigned:
+            print(f"Task {task['id']} (Criticality: {task['criticality']}) assigned to Cloud Server (Latency: {cloud_server['latency']} ms)")
+            cloud_server['capacity'] -= task['size']
+
+    # Process tasks
+    for task in tasks:
+        assign_task(task)
+
+    # Summary
+    print("\nSimulation Summary:")
+    for node in fog_nodes:
+        print(f"Fog Node {node['id']}: Remaining Capacity: {node['capacity']}")
+    print(f"Cloud Server: Remaining Capacity: {cloud_server['capacity']}")
+
+fog_edge_cloud_simulation()

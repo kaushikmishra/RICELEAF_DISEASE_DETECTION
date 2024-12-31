@@ -1,0 +1,33 @@
+# ---------------------------------
+# 1. AlexNet with Quaternion Enhancements and Atrous Convolution
+# ---------------------------------
+
+def build_alexnet_quaternion(input_shape=(224, 224, 3)):
+    inputs = Input(shape=input_shape)
+
+    # First convolutional layer (Quaternion-inspired feature extraction)
+    x = Conv2D(96, (11, 11), strides=(4, 4), activation='relu')(inputs)
+    x = BatchNormalization()(x)
+    x = MaxPooling2D(pool_size=(3, 3), strides=(2, 2))(x)
+
+    # Atrous convolution (Spatial feature enhancement)
+    x = Conv2D(256, (5, 5), activation='relu', dilation_rate=2)(x)
+    x = BatchNormalization()(x)
+    x = MaxPooling2D(pool_size=(3, 3), strides=(2, 2))(x)
+
+    # Third convolutional layer
+    x = Conv2D(384, (3, 3), activation='relu')(x)
+    x = BatchNormalization()(x)
+
+    # Fully connected layers
+    x = Flatten()(x)
+    x = Dense(4096, activation='relu')(x)
+    x = Dense(4096, activation='relu')(x)
+    outputs = Dense(10, activation='softmax')(x)  # Example: 10 output classes
+
+    model = Model(inputs, outputs)
+    return model
+
+alexnet_model = build_alexnet_quaternion()
+alexnet_model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+alexnet_model.summary()

@@ -1,0 +1,37 @@
+# ---------------------------------
+# 3. Fog-Edge-Cloud Framework Simulation
+# ---------------------------------
+
+def fog_edge_cloud_simulation():
+    """Simulation of IoAT device interactions with Fog and Cloud nodes"""
+    # Define fog nodes, cloud server, and tasks
+    fog_nodes = [{'id': i, 'capacity': random.randint(50, 100), 'latency': random.uniform(1, 5)} for i in range(5)]
+    cloud_server = {'id': 100, 'capacity': 1000, 'latency': 10.0}
+    tasks = [{'id': i, 'size': random.randint(10, 50), 'criticality': random.choice(['low', 'medium', 'high'])} for i in range(20)]
+
+    # Task assignment function
+    def assign_task(task):
+        assigned = False
+        # Try assigning to fog nodes based on capacity and latency
+        for node in sorted(fog_nodes, key=lambda x: x['latency']):
+            if task['size'] <= node['capacity']:
+                print(f"Task {task['id']} (Criticality: {task['criticality']}) assigned to Fog Node {node['id']} (Latency: {node['latency']:.2f} ms)")
+                node['capacity'] -= task['size']
+                assigned = True
+                break
+        # Assign to cloud if no fog node is available
+        if not assigned:
+            print(f"Task {task['id']} (Criticality: {task['criticality']}) assigned to Cloud Server (Latency: {cloud_server['latency']} ms)")
+            cloud_server['capacity'] -= task['size']
+
+    # Process tasks
+    for task in tasks:
+        assign_task(task)
+
+    # Summary
+    print("\nSimulation Summary:")
+    for node in fog_nodes:
+        print(f"Fog Node {node['id']}: Remaining Capacity: {node['capacity']}")
+    print(f"Cloud Server: Remaining Capacity: {cloud_server['capacity']}")
+
+fog_edge_cloud_simulation()
