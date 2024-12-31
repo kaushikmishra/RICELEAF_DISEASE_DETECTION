@@ -1,0 +1,79 @@
+# Digital Twin-Enabled Fog-Cloud Simulation with Dynamic Behavior
+import random
+import time
+
+# Define Digital Twin Environment
+class DigitalTwinFogCloudSimulation:
+    def __init__(self):
+        # Initialize fog nodes and cloud server
+        self.fog_nodes = [{'id': i, 'capacity': random.randint(50, 100), 'latency': random.uniform(1, 5)} for i in range(5)]
+        self.cloud_server = {'id': 100, 'capacity': 1000, 'latency': 10.0}
+        self.tasks = []
+
+    def generate_tasks(self, num_tasks):
+        """Dynamically generate tasks"""
+        for i in range(num_tasks):
+            task = {
+                'id': len(self.tasks),
+                'size': random.randint(10, 50),
+                'criticality': random.choice(['low', 'medium', 'high']),
+                'arrival_time': time.time()
+            }
+            self.tasks.append(task)
+
+    def fluctuate_resources(self):
+        """Simulate dynamic changes in fog node capacities"""
+        for node in self.fog_nodes:
+            fluctuation = random.randint(-5, 5)
+            node['capacity'] = max(0, node['capacity'] + fluctuation)
+
+    def simulate_node_failures(self):
+        """Randomly disable a fog node"""
+        if random.random() < 0.1:  # 10% chance of node failure
+            failed_node = random.choice(self.fog_nodes)
+            print(f"Fog Node {failed_node['id']} has failed and is unavailable.")
+            self.fog_nodes.remove(failed_node)
+
+    def assign_task(self, task):
+        """Assign task to the best available node or cloud"""
+        assigned = False
+        for node in sorted(self.fog_nodes, key=lambda x: x['latency']):
+            if task['size'] <= node['capacity']:
+                print(f"Task {task['id']} (Criticality: {task['criticality']}) assigned to Fog Node {node['id']} (Latency: {node['latency']:.2f} ms)")
+                node['capacity'] -= task['size']
+                assigned = True
+                break
+        if not assigned:
+            print(f"Task {task['id']} (Criticality: {task['criticality']}) assigned to Cloud Server (Latency: {self.cloud_server['latency']} ms)")
+            self.cloud_server['capacity'] -= task['size']
+
+    def run_simulation(self, duration, task_generation_rate):
+        """Run the simulation with dynamic behaviors"""
+        start_time = time.time()
+        while time.time() - start_time < duration:
+            # Generate tasks dynamically
+            if random.random() < task_generation_rate:
+                self.generate_tasks(1)
+
+            # Simulate resource fluctuations and node failures
+            self.fluctuate_resources()
+            self.simulate_node_failures()
+
+            # Assign tasks
+            if self.tasks:
+                task = self.tasks.pop(0)
+                self.assign_task(task)
+
+            # Wait before the next iteration
+            time.sleep(1)
+
+        # Simulation Summary
+        print("\nSimulation Summary:")
+        for node in self.fog_nodes:
+            print(f"Fog Node {node['id']}: Remaining Capacity: {node['capacity']}")
+        print(f"Cloud Server: Remaining Capacity: {self.cloud_server['capacity']}")
+
+# Run the Simulation
+if __name__ == "__main__":
+    simulation = DigitalTwinFogCloudSimulation()
+    simulation.run_simulation(duration=30, task_generation_rate=0.5)
